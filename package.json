@@ -1,0 +1,11 @@
+{
+  "name": "solar",
+  "version": "1.0.0",
+  "description": "3D solar system demo",
+  "scripts": {
+    "test": "echo 'No tests defined'"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT"
+}
