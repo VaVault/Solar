@@ -1,346 +1,137 @@
 <!doctype html>
-<html lang="th" data-theme="dark">
+<html lang="th">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ระบบสุริยะ | เว็ปสอนวิทยาศาสตร์ (Solar System EDU)</title>
-  <meta name="description" content="เว็บไซต์สอนวิทยาศาสตร์เรื่องระบบสุริยะ ดาวเคราะห์ แบบโต้ตอบ พร้อมค้นหา สรุปคำศัพท์ และแบบทดสอบย่อย เหมาะกับนักเรียน ม.ปลาย/ม.ต้น" />
-  <meta name="theme-color" content="#0d1321" />
+  <title>ระบบสุริยะ 3D | Solar System EDU</title>
+  <meta name="theme-color" content="#0b1020" />
+  <meta name="description" content="เว็บไซต์สอนวิทยาศาสตร์ ระบบสุริยะ 3D โคจรตามเส้น คลิกดาวเพื่อดูข้อมูล (ธีมมืดเท่านั้น)" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23fbbf24'/%3E%3Ccircle cx='50' cy='50' r='30' fill='%23f59e0b'/%3E%3C/svg%3E" />
   <style>
-    /* ===== Design Tokens ===== */
     :root{
-      --bg:#0b1020;
-      --panel:#0f1630;
-      --panel-2:#121934;
-      --text:#e6e9f2;
-      --muted:#a6b0cf;
-      --brand:#7c8cff;
-      --accent:#7ef0ff;
-      --ok:#22c55e;
-      --warn:#f59e0b;
-      --bad:#ef4444;
+      --bg:#0b1020; --panel:#0f1630; --panel-2:#121934;
+      --text:#e6e9f2; --muted:#a6b0cf; --accent:#7ef0ff;
+      --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
       --shadow: 0 10px 30px rgba(0,0,0,.35);
-      --radius:14px;
-      --radius-sm:10px;
-      --gap:16px;
-      --gap-lg:24px;
-      --w-max:1100px;
+      --radius:14px; --gap:16px; --w-max:1100px;
     }
-    [data-theme="light"]{
-      --bg:#f6f8ff;
-      --panel:#ffffff;
-      --panel-2:#f2f5ff;
-      --text:#172036;
-      --muted:#4b5563;
-      --brand:#3b5bff;
-      --accent:#0ea5e9;
-      --shadow: 0 10px 30px rgba(0,0,0,.12);
-    }
-
-    /* ===== Base ===== */
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Thai", "Noto Sans", "Helvetica Neue", Arial, "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
-      color:var(--text);
+      margin:0; color:var(--text);
       background: radial-gradient(1200px 600px at 50% -10%, #172042 0%, var(--bg) 42%, #060913 100%);
+      font-family: ui-sans-serif, system-ui, -apple-system,"Segoe UI",Roboto,"Noto Sans Thai","Noto Sans",Arial,sans-serif;
       line-height:1.6;
     }
-    a{color:var(--accent); text-decoration:none}
-    a:hover{text-decoration:underline}
-
-    /* ===== Top Bar ===== */
-    header{
-      position:sticky; top:0; z-index:10;
-      background:rgba(10,15,35,.65);
-      backdrop-filter:saturate(120%) blur(10px);
-      border-bottom:1px solid rgba(255,255,255,.06);
-    }
-    .bar{
-      max-width:var(--w-max); margin:auto;
-      display:flex; align-items:center; justify-content:space-between;
-      padding:10px var(--gap);
-    }
-    .brand{
-      display:flex; gap:10px; align-items:center; font-weight:700; letter-spacing:.2px
-    }
-    .brand .dot{
-      width:22px; height:22px; border-radius:50%;
-      background: radial-gradient(circle at 30% 30%, #ffe082, #f59e0b 60%, #b45309);
-      box-shadow:0 0 18px #f59e0b88, inset 0 0 10px #fff3;
-    }
-    nav{
-      display:flex; gap:10px; flex-wrap:wrap
-    }
-    nav a{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:10px 12px; border-radius:10px;
-      background:transparent; color:var(--text);
-      border:1px solid transparent;
-    }
+    a{color:var(--accent); text-decoration:none} a:hover{text-decoration:underline}
+    header{position:sticky; top:0; z-index:10; background:rgba(10,15,35,.65); backdrop-filter:saturate(120%) blur(10px); border-bottom:1px solid rgba(255,255,255,.06)}
+    .bar{max-width:var(--w-max); margin:auto; display:flex; align-items:center; justify-content:space-between; padding:10px var(--gap)}
+    .brand{display:flex; gap:10px; align-items:center; font-weight:700}
+    .brand .dot{width:22px; height:22px; border-radius:50%; background: radial-gradient(circle at 30% 30%, #ffe082, #f59e0b 60%, #b45309); box-shadow:0 0 18px #f59e0b88, inset 0 0 10px #fff3}
+    nav{display:flex; gap:10px; flex-wrap:wrap}
+    nav a{padding:10px 12px; border-radius:10px; border:1px solid transparent; color:var(--text)}
     nav a:hover{background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.08)}
-    .controls{display:flex; gap:8px; align-items:center}
-    .btn{
-      border:1px solid rgba(255,255,255,.1);
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      color:var(--text);
-      padding:9px 12px; border-radius:10px; cursor:pointer;
-      transition:.2s transform;
-    }
-    .btn:hover{transform:translateY(-1px)}
-    .btn:active{transform:translateY(0)}
-    .badge{
-      font-size:.75rem; background:rgba(255,255,255,.08); padding:2px 8px; border-radius:999px
-    }
-
-    /* ===== Layout ===== */
-    main{max-width:var(--w-max); margin:0 auto; padding: 22px var(--gap) 80px}
+    main{max-width:var(--w-max); margin:0 auto; padding:22px var(--gap) 80px}
     section{margin:30px 0}
-    .panel{
-      background:linear-gradient(180deg, var(--panel), var(--panel-2));
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding: clamp(16px, 2vw, 26px);
-    }
+    .panel{background:linear-gradient(180deg, var(--panel), var(--panel-2)); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); box-shadow:var(--shadow); padding: clamp(16px, 2vw, 26px)}
     h1,h2,h3{line-height:1.25; margin:0 0 10px}
-    h1{font-size: clamp(28px,4vw,42px)}
-    h2{font-size: clamp(22px,3vw,28px)}
-    p{margin:8px 0 0}
-
-    /* ===== Hero: Solar Display ===== */
-    .hero{
-      display:grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: var(--gap);
-    }
-    @media (max-width:900px){ .hero{grid-template-columns: 1fr} }
-    .solar{
-      position:relative;
-      aspect-ratio:1/1;
-      width:100%;
-      border-radius:var(--radius);
-      overflow:hidden;
-      background:
-        radial-gradient(140px 140px at 7% 50%, rgba(255,187,0,.25), transparent 70%),
-        radial-gradient(800px 800px at 50% 120%, rgba(126,240,255,.09), transparent 60%),
-        #0a0f1f;
-      border:1px dashed rgba(255,255,255,.07);
-    }
-    .solar .sun{
-      position:absolute; left:6%; top:50%; translate:0 -50%;
-      width:120px; aspect-ratio:1; border-radius:50%;
-      background: radial-gradient(circle at 35% 35%, #fff6bf, #ffd166 45%, #f59e0b 70%, #b45309 100%);
-      box-shadow:0 0 30px #ffb703aa, 0 0 120px #ffb70366, inset 0 0 20px #fff5;
-    }
-    .orbit{
-      position:absolute; inset:8% 6% 8% 28%;
-      border:1px dashed rgba(255,255,255,.09); border-radius:50%;
-      animation:spin var(--speed,40s) linear infinite;
-      transform-origin: center;
-    }
-    .orbit:nth-child(2){ inset:18% 12% 18% 34%; --speed: 20s}
-    .orbit:nth-child(3){ inset:27% 18% 27% 40%; --speed: 32s}
-    .orbit:nth-child(4){ inset:36% 24% 36% 46%; --speed: 42s}
-    .orbit:nth-child(5){ inset:52% 34% 52% 56%; --speed: 90s}
-    .orbit:nth-child(6){ inset:64% 40% 64% 62%; --speed: 150s}
-    .orbit:nth-child(7){ inset:74% 46% 74% 68%; --speed: 220s}
-    .orbit:nth-child(8){ inset:84% 52% 84% 74%; --speed: 300s}
-    @keyframes spin{ to{ rotate:360deg } }
-    @media (prefers-reduced-motion: reduce) {
-      .orbit{animation:none}
-    }
-    .planet{
-      position:absolute; left:calc(100% - 12px); top:50%; translate:-50% -50%;
-      border-radius:50%; border:1px solid rgba(255,255,255,.25);
-      box-shadow:0 0 16px rgba(126,240,255,.25), inset 0 0 10px rgba(255,255,255,.2);
-      cursor:pointer;
-    }
-    .p-mercury{ width:8px; aspect-ratio:1; background:#9aa1a8 }
-    .p-venus  { width:14px; background:linear-gradient(135deg,#caa96a,#b0874b) }
-    .p-earth  { width:14px; background:radial-gradient(circle at 60% 40%, #9beaf9 20%, #2b7a7b 35%, #1f3b73 60%, #0c2458) }
-    .p-mars   { width:10px; background:linear-gradient(135deg,#d25b38,#7b2d21) }
-    .p-jupiter{ width:26px; background:linear-gradient(90deg,#caa982,#a98263,#caa982,#a98263); }
-    .p-saturn { width:22px; background:linear-gradient(90deg,#d7c19a,#b89f76); }
-    .p-uranus { width:16px; background:#73d5e8 }
-    .p-neptune{ width:16px; background:#3b6fff }
-
-    .ring{ /* Saturn ring */
-      position:absolute; inset:-5px; border-radius:50%;
-      border: 6px solid rgba(255,255,255,.25);
-      transform: skewY(-20deg) rotate(20deg);
-      pointer-events:none;
-    }
-
-    /* ===== Tools row ===== */
-    .tools{
-      display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:8px
-    }
-    .field{
-      display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.08); padding:9px 12px; border-radius:10px;
-    }
-    .field input{
-      background:transparent; border:0; outline:0; color:var(--text); min-width:220px;
-    }
+    h1{font-size: clamp(28px,4vw,42px)} h2{font-size: clamp(22px,3vw,28px)}
+    .badge{font-size:.75rem; background:rgba(255,255,255,.08); padding:2px 8px; border-radius:999px}
+    .tools{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:8px}
     .chip{font-size:.8rem; padding:4px 8px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08)}
-
-    /* ===== Cards ===== */
-    .grid{
-      display:grid; gap:var(--gap);
-      grid-template-columns: repeat(12, 1fr);
-    }
-    .col-12{grid-column: span 12}
-    .col-6{grid-column: span 6}
-    .col-4{grid-column: span 4}
-    @media (max-width:1000px){ .col-4{grid-column: span 6} }
-    @media (max-width:700px){ .col-6,.col-4{grid-column: span 12} }
-
-    .card{
-      position:relative;
-      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:var(--radius);
-      padding:16px;
-      overflow:hidden;
-    }
-    .card h3{margin:0 0 6px}
-    .tag{font-size:.75rem; color:var(--muted)}
-    .planet-dot{
-      width:12px; height:12px; border-radius:50%; display:inline-block; margin-right:6px; vertical-align:middle
-    }
-    .facts{
-      display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; margin-top:10px;
-    }
+    .hero{display:grid; grid-template-columns: 1fr 1.2fr; gap:var(--gap)} @media(max-width:1000px){.hero{grid-template-columns:1fr}}
+    #sceneWrap{position:relative; border-radius:12px; overflow:hidden; border:1px solid rgba(255,255,255,.06)}
+    /* ให้มี "ความสูงจริง" เสมอ — ไม่พึ่ง aspect-ratio อย่างเดียว */
+    #scene3d{width:100%; height: min(60vh, 560px); min-height: 340px}
+    #infoBox{margin-top:10px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:12px}
+    .grid{display:grid; gap:var(--gap); grid-template-columns: repeat(12, 1fr)}
+    .col-12{grid-column: span 12} .col-6{grid-column: span 6} .col-4{grid-column: span 4}
+    @media(max-width:1000px){ .col-4{grid-column: span 6} } @media(max-width:700px){ .col-6,.col-4{grid-column: span 12} }
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:16px}
+    .tag{font-size:.85rem; color:var(--muted)} .planet-dot{width:12px; height:12px; border-radius:50%; display:inline-block; margin-right:6px; vertical-align:middle}
+    .facts{display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; margin-top:10px}
     .facts div{background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06); padding:10px; border-radius:10px; font-size:.94rem}
-    details{margin-top:8px}
-    summary{cursor:pointer; color:var(--accent)}
     .empty{opacity:.7; text-align:center; padding:30px}
-
-    /* ===== Glossary ===== */
-    .glossary{display:grid; gap:10px; grid-template-columns:repeat(2,minmax(0,1fr))}
-    @media (max-width:700px){ .glossary{grid-template-columns:1fr} }
-    .glossary .item{background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06); border-radius:10px; padding:12px}
-
-    /* ===== Quiz ===== */
+    .field{display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); padding:9px 12px; border-radius:10px}
+    .field input{background:transparent; border:0; outline:0; color:var(--text); min-width:220px}
     .quiz q{font-style:italic}
     .q-item{background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:12px; margin:10px 0}
     .choices{display:grid; gap:8px; margin-top:6px}
     .choices label{display:flex; gap:8px; align-items:flex-start; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06); padding:8px 10px; border-radius:10px; cursor:pointer}
-    .score{margin-top:12px; font-weight:700}
-    .good{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)}
-
-    /* ===== Footer ===== */
-    footer{
-      margin-top:50px; padding:30px var(--gap);
-      color:var(--muted); text-align:center; font-size:.9rem
-    }
+    .score{margin-top:12px; font-weight:700} .good{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+    footer{margin-top:50px; padding:30px var(--gap); color:var(--muted); text-align:center; font-size:.9rem}
     .kbd{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; background:rgba(255,255,255,.08); padding:2px 6px; border-radius:6px; border:1px solid rgba(255,255,255,.12)}
   </style>
 </head>
 <body>
-<header role="banner" aria-label="แถบนำทาง">
+<header role="banner">
   <div class="bar">
     <div class="brand">
       <span class="dot" aria-hidden="true"></span>
-      <span>ระบบสุริยะ • Solar System EDU</span>
-      <span class="badge">เวอร์ชันหน้าเดียว</span>
+      <span>ระบบสุริยะ • Solar System EDU (3D)</span>
+      <span class="badge">ธีมมืดเท่านั้น</span>
     </div>
-    <nav aria-label="ส่วนเมนู">
+    <nav aria-label="เมนู">
       <a href="#home">หน้าแรก</a>
       <a href="#planets">ดาวเคราะห์</a>
       <a href="#glossary">คำศัพท์</a>
       <a href="#quiz">แบบทดสอบ</a>
     </nav>
-    <div class="controls">
-      <button id="themeBtn" class="btn" type="button" aria-label="สลับโหมดแสง/มืด">🌓 โหมด</button>
-      <a class="btn" href="#howto" aria-label="วิธีใช้งานเว็บไซต์">ℹ️ วิธีใช้</a>
-    </div>
   </div>
 </header>
 
 <main>
-  <!-- HERO -->
   <section id="home" class="hero">
     <div class="panel">
-      <h1>สำรวจ <span style="color:var(--accent)">ระบบสุริยะ</span> แบบโต้ตอบ</h1>
-      <p>คลิกที่ดาวเคราะห์ในแบบจำลองเพื่อดูข้อมูลย่อ เลื่อนลงเพื่อดูการ์ดรายละเอียด ค้นหา และทำแบบทดสอบท้ายบท</p>
-      <div class="tools" aria-label="เครื่องมือด่วน">
-        <span class="chip">#ดวงอาทิตย์</span>
-        <span class="chip">#ดาวเคราะห์หิน</span>
-        <span class="chip">#ดาวเคราะห์แก๊ส</span>
-        <span class="chip">#ดาวเคราะห์น้ำแข็ง</span>
+      <h1>สำรวจระบบสุริยะ <span style="color:var(--accent)">แบบ 3D</span></h1>
+      <p>หมุน-ซูมฉากได้ และ <strong>คลิกดาวเคราะห์</strong> เพื่อดูข้อมูลด้านล่าง</p>
+      <div class="tools">
+        <span class="chip">#โคจรตามเส้น</span>
+        <span class="chip">#คลิกแล้วมีข้อมูล</span>
+        <span class="chip">#ธีมมืด</span>
       </div>
       <div class="panel" id="howto" style="margin-top:12px">
         <strong>วิธีใช้</strong>
         <ul>
-          <li>คลิกวงโคจร/ดาวในภาพขวา เพื่อเลื่อนลงไปยังการ์ดของดาวนั้น</li>
-          <li>ใช้ช่อง <em>ค้นหาดาว</em> กรองรายชื่อได้แบบเรียลไทม์</li>
-          <li>เปิด <span class="kbd">รายละเอียดเพิ่มเติม</span> เพื่อดูข้อมูลเชิงลึกและข้อสังเกต</li>
+          <li>เมาส์: ลาก = หมุน | ล้อเมาส์ = ซูม | คลิก = เปิดข้อมูล</li>
+          <li>มือถือ: นิ้วเดียว = หมุน | สองนิ้ว = ซูม/แพน</li>
+          <li>เส้นวงโคจร = เส้นทางจริงในฉาก ดาวจะวิ่งตามเส้นนี้</li>
         </ul>
       </div>
     </div>
 
-    <!-- Interactive Solar -->
-    <div class="panel" aria-label="แบบจำลองระบบสุริยะ">
-      <div class="solar" id="solar">
-        <div class="sun" role="img" aria-label="ดวงอาทิตย์"></div>
-        <div class="orbit"><button class="planet p-mercury" data-link="#mercury" aria-label="ดาวพุธ"></button></div>
-        <div class="orbit"><button class="planet p-venus" data-link="#venus" aria-label="ดาวศุกร์"></button></div>
-        <div class="orbit"><button class="planet p-earth" data-link="#earth" aria-label="โลก"></button></div>
-        <div class="orbit"><button class="planet p-mars" data-link="#mars" aria-label="ดาวอังคาร"></button></div>
-        <div class="orbit"><button class="planet p-jupiter" data-link="#jupiter" aria-label="ดาวพฤหัสบดี"></button></div>
-        <div class="orbit"><button class="planet p-saturn" data-link="#saturn" aria-label="ดาวเสาร์"><span class="ring" aria-hidden="true"></span></button></div>
-        <div class="orbit"><button class="planet p-uranus" data-link="#uranus" aria-label="ดาวยูเรนัส"></button></div>
-        <div class="orbit"><button class="planet p-neptune" data-link="#neptune" aria-label="ดาวเนปจูน"></button></div>
+    <div class="panel">
+      <div id="sceneWrap"><div id="scene3d" aria-label="ฉากระบบสุริยะสามมิติ"></div></div>
+      <div id="infoBox" aria-live="polite" class="card" style="margin-top:10px">
+        <div><strong>คลิกดาวเคราะห์</strong> เพื่อดูข้อมูลที่นี่</div>
       </div>
-      <p class="tag" style="margin-top:10px">* ความเร็วการโคจรในภาพเป็นการจำลองเพื่อการเรียนรู้ (ไม่ใช่มาตราส่วนจริง)</p>
     </div>
   </section>
 
-  <!-- PLANETS -->
   <section id="planets" class="panel">
     <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap">
       <h2 style="margin:0">ดาวเคราะห์และดวงอาทิตย์</h2>
-      <div class="field" role="search">
-        🔎 <input id="search" type="search" placeholder="ค้นหาดาว เช่น โลก, แก๊ส, 1 AU, 365 วัน…" aria-label="ค้นหาดาวเคราะห์" />
+      <div class="field" role="search">🔎
+        <input id="search" type="search" placeholder="ค้นหา: โลก, แก๊ส, 1 AU, 365 วัน…" aria-label="ค้นหาดาวเคราะห์" />
       </div>
     </div>
-
     <div class="grid" id="planetGrid" style="margin-top:14px"></div>
     <div id="emptyState" class="empty" hidden>ไม่พบผลลัพธ์ที่ตรงกับการค้นหา 🛰️</div>
-
     <div class="panel" style="margin-top:16px">
-      <strong>หมายเหตุ:</strong> ค่าต่าง ๆ เป็นค่าเชิงประมาณเพื่อการศึกษา (เช่น รัศมี ระยะโคจร เวลาโคจร) และอาจปัดเศษให้จำง่าย
+      <strong>หมายเหตุ:</strong> ค่าต่าง ๆ ในหน้านี้เป็นค่าเชิงประมาณเพื่อการศึกษา
     </div>
   </section>
 
-  <!-- GLOSSARY -->
   <section id="glossary" class="panel">
     <h2>คลังคำศัพท์ดาราศาสตร์</h2>
-    <div class="glossary" style="margin-top:8px">
-      <div class="item">
-        <strong>AU (หน่วยดาราศาสตร์)</strong>
-        <p>ระยะเฉลี่ยจากโลกถึงดวงอาทิตย์ ประมาณ 150 ล้านกม. ใช้บอกขนาดวงโคจรในระบบสุริยะ</p>
-      </div>
-      <div class="item">
-        <strong>เอียงแกน (Axial Tilt)</strong>
-        <p>มุมเอียงของแกนหมุนของดาวเมื่อเทียบกับแนวตั้งฉากระนาบโคจร มีผลต่อฤดูกาล</p>
-      </div>
-      <div class="item">
-        <strong>ดาวเคราะห์หิน / แก๊ส / น้ำแข็ง</strong>
-        <p>หิน: พุธ ศุกร์ โลก อังคาร | แก๊ส: พฤหัสบดี เสาร์ | น้ำแข็ง: ยูเรนัส เนปจูน</p>
-      </div>
-      <div class="item">
-        <strong>ดาวเคราะห์แคระ (Dwarf Planet)</strong>
-        <p>วัตถุที่โคจรรอบดวงอาทิตย์ มีมวลมากพอเป็นทรงกลม แต่ยังไม่เคลียร์บริเวณโคจร เช่น พลูโต เซเรส เอริส</p>
-      </div>
+    <div class="grid" style="margin-top:8px; grid-template-columns:repeat(12,1fr)">
+      <div class="col-6 card"><strong>AU (หน่วยดาราศาสตร์)</strong><p>≈ 150 ล้านกม. ระยะเฉลี่ย โลก→ดวงอาทิตย์</p></div>
+      <div class="col-6 card"><strong>เอียงแกน (Axial Tilt)</strong><p>มุมเอียงของแกนหมุน มีผลต่อฤดูกาล</p></div>
+      <div class="col-6 card"><strong>ดาวเคราะห์หิน/แก๊ส/น้ำแข็ง</strong><p>หิน: พุธ ศุกร์ โลก อังคาร | แก๊ส: พฤหัสบดี เสาร์ | น้ำแข็ง: ยูเรนัส เนปจูน</p></div>
+      <div class="col-6 card"><strong>ดาวเคราะห์แคระ</strong><p>โคจรรอบดวงอาทิตย์ มวลพอเป็นทรงกลม แต่ยังไม่เคลียร์บริเวณโคจร (เช่น พลูโต)</p></div>
     </div>
   </section>
 
-  <!-- QUIZ -->
   <section id="quiz" class="panel quiz" aria-labelledby="quizTitle">
     <h2 id="quizTitle">แบบทดสอบย่อย (5 ข้อ)</h2>
     <form id="quizForm">
@@ -377,7 +168,7 @@
         </div>
       </div>
       <div class="q-item">
-        <div>5) แถบดาวเคราะห์น้อย (Asteroid Belt) อยู่ระหว่างดาวคู่ใด?</div>
+        <div>5) แถบดาวเคราะห์น้อยอยู่ระหว่างดาวคู่ใด?</div>
         <div class="choices">
           <label><input type="radio" name="q5" value="A"> พุธ–ศุกร์</label>
           <label><input type="radio" name="q5" value="B"> อังคาร–พฤหัสบดี</label>
@@ -385,8 +176,8 @@
         </div>
       </div>
       <div class="tools">
-        <button class="btn" type="submit">ตรวจคำตอบ</button>
-        <button class="btn" type="reset">ล้างคำตอบ</button>
+        <button class="chip" type="submit">ตรวจคำตอบ</button>
+        <button class="chip" type="reset">ล้างคำตอบ</button>
         <span id="score" class="score" aria-live="polite"></span>
       </div>
     </form>
@@ -394,204 +185,234 @@
 </main>
 
 <footer>
-  สงวนลิขสิทธิ์ © <span id="year"></span> Solar System EDU • เขียนด้วย HTML + CSS + JS ไฟล์เดียว •
-  <span class="kbd">Tips</span> กด <span class="kbd">🌓 โหมด</span> เพื่อสลับธีม
+  สงวนลิขสิทธิ์ © <span id="year"></span> Solar System EDU • ไฟล์เดียวพร้อมรันบน GitHub Pages
 </footer>
 
 <script>
-/* ===== Theme ===== */
-const themeBtn = document.getElementById('themeBtn');
-function setTheme(t){ document.documentElement.setAttribute('data-theme', t); localStorage.setItem('theme', t); }
-(function initTheme(){
-  const saved = localStorage.getItem('theme');
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  setTheme(saved || (prefersDark ? 'dark' : 'light'));
-})();
-themeBtn.addEventListener('click', () => {
-  const now = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  setTheme(now);
-});
-
-/* ===== Smooth link from solar to card ===== */
-document.getElementById('solar')?.addEventListener('click', (e)=>{
-  const link = e.target?.dataset?.link;
-  if(link){
-    document.querySelector(link)?.scrollIntoView({behavior:'smooth', block:'start'});
-    // highlight
-    const c = document.querySelector(link);
-    c?.classList.add('pulse');
-    setTimeout(()=>c?.classList.remove('pulse'), 1200);
-  }
-});
-
-/* ===== Year ===== */
 document.getElementById('year').textContent = new Date().getFullYear();
+</script>
 
-/* ===== ข้อมูลดาวเคราะห์ (แก้ได้) ===== */
-const PLANETS = [
-  {
-    id:'sun', nameTH:'ดวงอาทิตย์', nameEN:'Sun', type:'ดาวฤกษ์',
-    color:'#f59e0b', dot:'#f59e0b',
-    radius_km:696340, orbit_au:0, orbit:'—', rotation:'~25 วัน (ที่ศูนย์สูตร)',
-    moons:'—',
-    facts:[
-      'แหล่งพลังงานหลักของระบบสุริยะ จากปฏิกิริยานิวเคลียร์ฟิวชัน',
-      'คิดเป็นมวลมากกว่า 99% ของระบบสุริยะทั้งหมด'
-    ]
-  },
-  {
-    id:'mercury', nameTH:'ดาวพุธ', nameEN:'Mercury', type:'หิน',
-    color:'#9aa1a8', dot:'#9aa1a8',
-    radius_km:2440, orbit_au:0.39, orbit:'88 วัน', rotation:'~59 วัน',
-    moons:'ไม่มี',
-    facts:[
-      'มีอุณหภูมิผันผวนมาก เพราะแทบไม่มีบรรยากาศกักเก็บความร้อน',
-      'เกิดเครเตอร์จำนวนมากจากการชนของอุกกาบาต'
-    ]
-  },
-  {
-    id:'venus', nameTH:'ดาวศุกร์', nameEN:'Venus', type:'หิน',
-    color:'#caa96a', dot:'#caa96a',
-    radius_km:6052, orbit_au:0.72, orbit:'225 วัน', rotation:'~243 วัน (หมุนย้อนทิศ)',
-    moons:'ไม่มี',
-    facts:[
-      'ชั้นบรรยากาศหนาทำให้เกิดปรากฏการณ์เรือนกระจกอย่างรุนแรง',
-      'สว่างที่สุดในท้องฟ้ายามค่ำคืนรองจากดวงจันทร์'
-    ]
-  },
-  {
-    id:'earth', nameTH:'โลก', nameEN:'Earth', type:'หิน',
-    color:'#2b7a7b', dot:'#2b7a7b',
-    radius_km:6371, orbit_au:1.00, orbit:'365 วัน', rotation:'23 ชม. 56 นาที',
-    moons:'1 (ดวงจันทร์)',
-    facts:[
-      'มีน้ำสถานะของเหลวจำนวนมากและชั้นบรรยากาศเหมาะสมต่อสิ่งมีชีวิต',
-      'สนามแม่เหล็กโลกช่วยปกป้องจากลมสุริยะ'
-    ]
-  },
-  {
-    id:'mars', nameTH:'ดาวอังคาร', nameEN:'Mars', type:'หิน',
-    color:'#d25b38', dot:'#d25b38',
-    radius_km:3390, orbit_au:1.52, orbit:'687 วัน', rotation:'24.6 ชม.',
-    moons:'โฟบอส เดมอส',
-    facts:[
-      'มีภูเขาไฟโอลิมปัส มอนส์ สูงที่สุดในระบบสุริยะ (ฐานกว้างมาก)',
-      'มีฝุ่นและพายุทรายขนาดใหญ่เป็นบางช่วง'
-    ]
-  },
-  {
-    id:'jupiter', nameTH:'ดาวพฤหัสบดี', nameEN:'Jupiter', type:'แก๊ส',
-    color:'#caa982', dot:'#caa982',
-    radius_km:69911, orbit_au:5.20, orbit:'11.86 ปี', rotation:'~9.9 ชม.',
-    moons:'หลายสิบดวง (เช่น ไอโอ ยูโรปา แกนีมีด คัลลิสโต)',
-    facts:[
-      'จุดแดงใหญ่คือพายุหมุนยักษ์ที่ดำรงอยู่นานหลายร้อยปี',
-      'มีสนามแม่เหล็กแรงมากและมีวงแหวนจาง ๆ'
-    ]
-  },
-  {
-    id:'saturn', nameTH:'ดาวเสาร์', nameEN:'Saturn', type:'แก๊ส',
-    color:'#d7c19a', dot:'#d7c19a',
-    radius_km:58232, orbit_au:9.58, orbit:'29.5 ปี', rotation:'~10.7 ชม.',
-    moons:'หลายสิบดวง (ไททัน เอนเซลาดัส ฯลฯ)',
-    facts:[
-      'มีวงแหวนเด่นชัด ประกอบด้วยน้ำแข็งและเศษหินจำนวนนับไม่ถ้วน',
-      'ไททันมีชั้นบรรยากาศหนาและมีทะเลมีเทน/อีเทน'
-    ]
-  },
-  {
-    id:'uranus', nameTH:'ดาวยูเรนัส', nameEN:'Uranus', type:'น้ำแข็ง',
-    color:'#73d5e8', dot:'#73d5e8',
-    radius_km:25362, orbit_au:19.2, orbit:'84 ปี', rotation:'~17 ชม. (หมุนเอียงเกือบข้าง)',
-    moons:'กว่า 20 ดวง',
-    facts:[
-      'เอียงแกน ~98° ทำให้เหมือน “กลิ้ง” ไปตามวงโคจร',
-      'บรรยากาศมีมีเทนทำให้ปรากฏเป็นสีฟ้าอมเขียว'
-    ]
-  },
-  {
-    id:'neptune', nameTH:'ดาวเนปจูน', nameEN:'Neptune', type:'น้ำแข็ง',
-    color:'#3b6fff', dot:'#3b6fff',
-    radius_km:24622, orbit_au:30.1, orbit:'164.8 ปี', rotation:'~16 ชม.',
-    moons:'ทริตัน ฯลฯ',
-    facts:[
-      'ลมแรงมากที่สุดในระบบสุริยะ วัดได้หลายร้อยเมตรต่อวินาที',
-      'สีน้ำเงินเข้มจากมีเทนดูดกลืนแสงสีแดง'
-    ]
+<script type="module">
+  import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+  import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+
+  const PLANETS = [
+    { id:'sun',     nameTH:'ดวงอาทิตย์', nameEN:'Sun',     type:'ดาวฤกษ์', color:'#f59e0b', dot:'#f59e0b', radius_km:696340, orbit_au:0,   orbit:'—',        rotation:'~25 วัน (ศูนย์สูตร)', moons:'—', facts:['พลังงานจากฟิวชัน','มวล >99% ของระบบสุริยะ'] },
+    { id:'mercury', nameTH:'ดาวพุธ',     nameEN:'Mercury', type:'หิน',      color:'#9aa1a8', dot:'#9aa1a8', radius_km:2440,   orbit_au:0.39, orbit:'88 วัน',  rotation:'~59 วัน',            moons:'ไม่มี', facts:['อุณหภูมิผันผวนมาก','เครเตอร์จำนวนมาก'] },
+    { id:'venus',   nameTH:'ดาวศุกร์',   nameEN:'Venus',   type:'หิน',      color:'#caa96a', dot:'#caa96a', radius_km:6052,   orbit_au:0.72, orbit:'225 วัน', rotation:'~243 วัน (ย้อนทิศ)',  moons:'ไม่มี', facts:['เรือนกระจกแรง','สว่างรองจากดวงจันทร์'] },
+    { id:'earth',   nameTH:'โลก',        nameEN:'Earth',   type:'หิน',      color:'#2b7a7b', dot:'#2b7a7b', radius_km:6371,   orbit_au:1.00, orbit:'365 วัน', rotation:'23 ชม. 56 นาที',     moons:'1 (ดวงจันทร์)', facts:['มีน้ำของเหลว','สนามแม่เหล็กโลก'] },
+    { id:'mars',    nameTH:'ดาวอังคาร',  nameEN:'Mars',    type:'หิน',      color:'#d25b38', dot:'#d25b38', radius_km:3390,   orbit_au:1.52, orbit:'687 วัน', rotation:'24.6 ชม.',           moons:'โฟบอส เดมอส', facts:['โอลิมปัสมอนส์','พายุฝุ่นใหญ่'] },
+    { id:'jupiter', nameTH:'ดาวพฤหัสบดี',nameEN:'Jupiter', type:'แก๊ส',     color:'#caa982', dot:'#caa982', radius_km:69911,  orbit_au:5.20, orbit:'11.86 ปี',rotation:'~9.9 ชม.',           moons:'หลายสิบดวง', facts:['จุดแดงใหญ่','วงแหวนจาง'] },
+    { id:'saturn',  nameTH:'ดาวเสาร์',   nameEN:'Saturn',  type:'แก๊ส',     color:'#d7c19a', dot:'#d7c19a', radius_km:58232,  orbit_au:9.58, orbit:'29.5 ปี', rotation:'~10.7 ชม.',          moons:'ไททัน ฯลฯ', facts:['วงแหวนเด่นชัด','ไททันมีบรรยากาศ'] },
+    { id:'uranus',  nameTH:'ดาวยูเรนัส', nameEN:'Uranus',  type:'น้ำแข็ง',  color:'#73d5e8', dot:'#73d5e8', radius_km:25362,  orbit_au:19.2, orbit:'84 ปี',   rotation:'~17 ชม. (เอียง ~98°)', moons:'>20 ดวง', facts:['เหมือนกลิ้ง','สีฟ้าจากมีเทน'] },
+    { id:'neptune', nameTH:'ดาวเนปจูน',  nameEN:'Neptune', type:'น้ำแข็ง',  color:'#3b6fff', dot:'#3b6fff', radius_km:24622,  orbit_au:30.1, orbit:'164.8 ปี',rotation:'~16 ชม.',            moons:'ทริตัน ฯลฯ', facts:['ลมแรงมาก','มีเทนดูดกลืนแดง'] }
+  ];
+
+  /* ====== 3D Scene ====== */
+  const wrap = document.getElementById('scene3d');
+  // เผื่อบางเบราว์เซอร์รายงาน clientHeight = 0 ให้ตั้งความสูงสำรอง
+  if (wrap.clientHeight < 10) { wrap.style.height = Math.max(340, Math.round(wrap.clientWidth*0.62)) + 'px'; }
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x060913);
+
+  const camera = new THREE.PerspectiveCamera(55, wrap.clientWidth / wrap.clientHeight, 0.1, 5000);
+  camera.position.set(0, 120, 260);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+  wrap.appendChild(renderer.domElement);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true; controls.dampingFactor = 0.05;
+  controls.minDistance = 40; controls.maxDistance = 900;
+
+  const hemi = new THREE.HemisphereLight(0x334466, 0x000011, 0.6); scene.add(hemi);
+  const sunLight = new THREE.PointLight(0xffbb66, 2.2, 0, 2); scene.add(sunLight);
+
+  // Sun
+  const sun = new THREE.Mesh(
+    new THREE.SphereGeometry(10, 32, 32),
+    new THREE.MeshStandardMaterial({ color: 0xf5a623, emissive: 0xffa500, emissiveIntensity: 0.9, roughness: 0.4 })
+  );
+  sun.name = 'sun'; scene.add(sun);
+
+  // Stars
+  const starCount = 1200;
+  const starsPos = new Float32Array(starCount*3);
+  for(let i=0;i<starCount;i++){
+    const r = 1200*Math.cbrt(Math.random());
+    const theta = Math.random()*Math.PI*2;
+    const phi = Math.acos(2*Math.random()-1);
+    starsPos[i*3] = r*Math.sin(phi)*Math.cos(theta);
+    starsPos[i*3+1] = r*Math.cos(phi);
+    starsPos[i*3+2] = r*Math.sin(phi)*Math.sin(theta);
   }
-];
+  const stars = new THREE.Points(
+    new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(starsPos,3)),
+    new THREE.PointsMaterial({ size: 1.1, color: 0x9bb3ff })
+  );
+  scene.add(stars);
 
-/* ===== Render Cards ===== */
-const grid = document.getElementById('planetGrid');
-function factList(facts){
-  return facts.map(f => `<li>${f}</li>`).join('');
-}
-function card(p){
-  const dot = `<span class="planet-dot" style="background:${p.dot}"></span>`;
-  return `
-  <div class="col-4">
-    <article id="${p.id}" class="card" aria-labelledby="${p.id}-title">
-      <header>
-        <h3 id="${p.id}-title">${dot}${p.nameTH} <span class="tag">(${p.nameEN})</span></h3>
-        <div class="tag">ประเภท: ${p.type}</div>
-      </header>
-      <div class="facts">
+  // Scales & speed
+  const scaleAU = 8;           // 1 AU -> 8 units (ย่อขนาดให้พอดีฉาก)
+  const sizeScale = 0.03;      // ย่อรัศมี
+  const BASE_SPEED = 0.6;      // ความเร็วรวม
+
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  const pickables = [];
+  const system = []; // {id,a,b,theta,omega,mesh}
+
+  function orbitPath(a_au){
+    const a = a_au*scaleAU, b = a*0.88; // วงรีเล็กน้อย
+    const seg = 256, pts = [];
+    for(let i=0;i<=seg;i++){
+      const t = (i/seg)*Math.PI*2;
+      pts.push(new THREE.Vector3(a*Math.cos(t), 0, b*Math.sin(t)));
+    }
+    const geo = new THREE.BufferGeometry().setFromPoints(pts);
+    const line = new THREE.Line(geo, new THREE.LineDashedMaterial({ color:0x5aa9ff, dashSize:1.2, gapSize:0.6, transparent:true, opacity:0.55 }));
+    line.computeLineDistances();
+    return {line,a,b};
+  }
+  function planetMesh(colorHex, radius_km){
+    const r = Math.max(0.8, Math.cbrt(radius_km) * sizeScale);
+    return new THREE.Mesh(
+      new THREE.SphereGeometry(r, 24, 18),
+      new THREE.MeshStandardMaterial({ color: new THREE.Color(colorHex), roughness:0.6 })
+    );
+  }
+
+  PLANETS.forEach(p=>{
+    if(p.id==='sun') return;
+    const {line,a,b} = orbitPath(p.orbit_au);
+    scene.add(line);
+
+    const m = planetMesh(p.color, p.radius_km);
+    m.userData.planetId = p.id; m.name = p.id;
+    pickables.push(m); scene.add(m);
+
+    if(p.id==='saturn'){
+      const pr = m.geometry.parameters.radius;
+      const ring = new THREE.Mesh(
+        new THREE.RingGeometry(Math.max(pr*1.6,2.4), Math.max(pr*2.6,3.6), 64),
+        new THREE.MeshBasicMaterial({ color:0xd7c19a, transparent:true, opacity:0.5, side:THREE.DoubleSide })
+      );
+      ring.rotation.x = -Math.PI/2.5; m.add(ring);
+    }
+
+    const a_au = p.orbit_au || 1;
+    const omega = BASE_SPEED / Math.sqrt(a_au**3);
+    system.push({ id:p.id, a, b, theta: Math.random()*Math.PI*2, omega, mesh: m });
+  });
+
+  const infoBox = document.getElementById('infoBox');
+  function showInfo(id){
+    const p = PLANETS.find(x=>x.id===id); if(!p) return;
+    infoBox.innerHTML = `
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
+        <div class="planet-dot" style="background:${p.dot};width:14px;height:14px"></div>
+        <div><strong>${p.nameTH}</strong> <span class="tag">(${p.nameEN})</span></div>
+      </div>
+      <div class="facts" style="margin-top:10px">
+        <div><strong>ประเภท</strong><br>${p.type}</div>
         <div><strong>รัศมี</strong><br>${p.radius_km.toLocaleString()} กม.</div>
         <div><strong>ระยะโคจร</strong><br>${p.orbit_au || '—'} AU</div>
         <div><strong>เวลาโคจร</strong><br>${p.orbit}</div>
-        <div><strong>หมุนรอบตัวเอง</strong><br>${p.rotation}</div>
         <div style="grid-column: span 2"><strong>ดวงจันทร์</strong><br>${p.moons}</div>
       </div>
-      <details>
-        <summary>รายละเอียดเพิ่มเติม</summary>
-        <ul style="margin-top:8px">${factList(p.facts)}</ul>
-      </details>
-    </article>
-  </div>`;
-}
-function render(list=PLANETS){
-  grid.innerHTML = list.map(card).join('');
-  document.getElementById('emptyState').hidden = list.length !== 0;
-}
-render();
-
-/* ===== Search/Filter ===== */
-const search = document.getElementById('search');
-search.addEventListener('input', e=>{
-  const q = e.target.value.trim().toLowerCase();
-  const filtered = PLANETS.filter(p=>{
-    const txt = [
-      p.nameTH, p.nameEN, p.type,
-      p.radius_km, p.orbit_au, p.orbit, p.rotation, p.moons,
-      ...p.facts
-    ].join(' ').toLowerCase();
-    return txt.includes(q);
-  });
-  render(filtered);
-});
-
-/* ===== Quiz ===== */
-const quizKey = { q1:'A', q2:'B', q3:'C', q4:'B', q5:'B' };
-document.getElementById('quizForm').addEventListener('submit', (e)=>{
-  e.preventDefault();
-  let score = 0, total = Object.keys(quizKey).length;
-  for(const k in quizKey){
-    const val = (new FormData(e.target)).get(k);
-    if(val === quizKey[k]) score++;
+      <ul style="margin-top:8px">${p.facts?.map(f=>`<li>${f}</li>`).join('')||''}</ul>
+      <div style="margin-top:10px"><a href="#${p.id}">ดูการ์ดรายละเอียด ⤵</a></div>
+    `;
   }
-  const pct = Math.round(score/total*100);
-  const el = document.getElementById('score');
-  let cls = 'good', msg='เยี่ยม!';
-  if(pct < 60){ cls = 'bad'; msg='ลองใหม่อีกครั้ง!'; }
-  else if(pct < 80){ cls = 'warn'; msg='ดีมาก!'; }
-  el.className = 'score ' + cls;
-  el.textContent = `คะแนน: ${score}/${total} (${pct}%) – ${msg}`;
-});
 
-/* ===== Small polish ===== */
-const css = document.createElement('style');
-css.textContent = `.pulse{box-shadow:0 0 0 0 rgba(126,240,255,.6); animation:pulse .9s 2} @keyframes pulse{to{box-shadow:0 0 0 16px rgba(126,240,255,0)}}`;
-document.head.appendChild(css);
+  function onPointer(ev){
+    const rect = renderer.domElement.getBoundingClientRect();
+    mouse.x = ((ev.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((ev.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+    const hits = raycaster.intersectObjects(pickables, false);
+    if(hits.length){
+      const obj = hits[0].object;
+      showInfo(obj.userData.planetId);
+      obj.material.emissive = new THREE.Color(0xffffff);
+      obj.material.emissiveIntensity = 0.25;
+      setTimeout(()=>{ obj.material.emissiveIntensity = 0; }, 250);
+    }
+  }
+  renderer.domElement.addEventListener('pointerdown', onPointer);
+
+  function resize(){
+    // เผื่อกรณีเบราว์เซอร์รายงาน h=0
+    if (wrap.clientHeight < 10) { wrap.style.height = Math.max(340, Math.round(wrap.clientWidth*0.62)) + 'px'; }
+    const w = wrap.clientWidth, h = wrap.clientHeight || 400;
+    camera.aspect = w/h; camera.updateProjectionMatrix();
+    renderer.setSize(w,h);
+  }
+  window.addEventListener('resize', resize); resize();
+
+  const clock = new THREE.Clock();
+  function tick(){
+    const dt = clock.getDelta();
+    system.forEach(b=>{
+      b.theta += b.omega * dt;
+      b.mesh.position.set(b.a * Math.cos(b.theta), 0, b.b * Math.sin(b.theta));
+      b.mesh.rotation.y += 0.01;
+    });
+    sunLight.position.copy(sun.position);
+    controls.update();
+    renderer.render(scene, camera);
+    requestAnimationFrame(tick);
+  }
+  tick();
+
+  /* ====== Cards / Search / Quiz (ส่วนหน้าเนื้อหา) ====== */
+  const grid = document.getElementById('planetGrid');
+  function factList(facts){ return (facts||[]).map(f=>`<li>${f}</li>`).join(''); }
+  function card(p){
+    const dot = `<span class="planet-dot" style="background:${p.dot}"></span>`;
+    return `
+    <div class="col-4">
+      <article id="${p.id}" class="card" aria-labelledby="${p.id}-title">
+        <header>
+          <h3 id="${p.id}-title">${dot}${p.nameTH} <span class="tag">(${p.nameEN})</span></h3>
+          <div class="tag">ประเภท: ${p.type}</div>
+        </header>
+        <div class="facts">
+          <div><strong>รัศมี</strong><br>${p.radius_km.toLocaleString()} กม.</div>
+          <div><strong>ระยะโคจร</strong><br>${p.orbit_au || '—'} AU</div>
+          <div><strong>เวลาโคจร</strong><br>${p.orbit}</div>
+          <div><strong>หมุนรอบตัวเอง</strong><br>${p.rotation}</div>
+          <div style="grid-column: span 2"><strong>ดวงจันทร์</strong><br>${p.moons}</div>
+        </div>
+        <details><summary>รายละเอียดเพิ่มเติม</summary><ul style="margin-top:8px">${factList(p.facts)}</ul></details>
+      </article>
+    </div>`;
+  }
+  function render(list=PLANETS){ grid.innerHTML = list.map(card).join(''); document.getElementById('emptyState').hidden = list.length!==0; }
+  render();
+
+  document.getElementById('search').addEventListener('input', e=>{
+    const q = e.target.value.trim().toLowerCase();
+    const filtered = PLANETS.filter(p=>{
+      const txt = [p.nameTH,p.nameEN,p.type,p.radius_km,p.orbit_au,p.orbit,p.rotation,p.moons,...(p.facts||[])].join(' ').toLowerCase();
+      return txt.includes(q);
+    });
+    render(filtered);
+  });
+
+  const quizKey = { q1:'A', q2:'B', q3:'C', q4:'B', q5:'B' };
+  document.getElementById('quizForm').addEventListener('submit', (e)=>{
+    e.preventDefault(); let score=0, total=Object.keys(quizKey).length;
+    for(const k in quizKey){ const v=(new FormData(e.target)).get(k); if(v===quizKey[k]) score++; }
+    const pct=Math.round(score/total*100); const el=document.getElementById('score');
+    let cls='good', msg='เยี่ยม!'; if(pct<60){cls='bad'; msg='ลองใหม่อีกครั้ง!';} else if(pct<80){cls='warn'; msg='ดีมาก!';}
+    el.className='score '+cls; el.textContent=`คะแนน: ${score}/${total} (${pct}%) – ${msg}`;
+  });
 </script>
 </body>
 </html>
