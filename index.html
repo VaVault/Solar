@@ -1,418 +1,449 @@
-<!doctype html>
-<html lang="th">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ระบบสุริยะ 3D | Solar System EDU</title>
-  <meta name="theme-color" content="#0b1020" />
-  <meta name="description" content="เว็บไซต์สอนวิทยาศาสตร์ ระบบสุริยะ 3D โคจรตามเส้น คลิกดาวเพื่อดูข้อมูล (ธีมมืดเท่านั้น)" />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23fbbf24'/%3E%3Ccircle cx='50' cy='50' r='30' fill='%23f59e0b'/%3E%3C/svg%3E" />
+  <title>3D Solar System — Learn & Explore</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark">
   <style>
     :root{
-      --bg:#0b1020; --panel:#0f1630; --panel-2:#121934;
-      --text:#e6e9f2; --muted:#a6b0cf; --accent:#7ef0ff;
-      --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
-      --radius:14px; --gap:16px; --w-max:1100px;
+      --bg:#0b0f14; --panel:#0f1620; --panel-2:#141c28; --text:#dfe7f5; --muted:#9ab;
+      --accent:#66b3ff; --accent-2:#ffa94d; --ok:#55d37a;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; color:var(--text);
-      background: radial-gradient(1200px 600px at 50% -10%, #172042 0%, var(--bg) 42%, #060913 100%);
-      font-family: ui-sans-serif, system-ui, -apple-system,"Segoe UI",Roboto,"Noto Sans Thai","Noto Sans",Arial,sans-serif;
-      line-height:1.6;
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Noto Sans",Arial,"Apple Color Emoji","Segoe UI Emoji";}
+    #app{position:fixed;inset:0;overflow:hidden}
+    canvas{display:block;outline:none}
+    /* Top control bar */
+    #toolbar{
+      position:fixed;left:12px;right:12px;top:12px;display:flex;gap:10px;align-items:center;
+      background:linear-gradient(180deg,rgba(15,22,32,.9),rgba(15,22,32,.85));backdrop-filter:blur(6px);
+      border:1px solid #1c2838;border-radius:10px;padding:10px 12px;z-index:10
     }
-    a{color:var(--accent); text-decoration:none} a:hover{text-decoration:underline}
-    header{position:sticky; top:0; z-index:10; background:rgba(10,15,35,.65); backdrop-filter:saturate(120%) blur(10px); border-bottom:1px solid rgba(255,255,255,.06)}
-    .bar{max-width:var(--w-max); margin:auto; display:flex; align-items:center; justify-content:space-between; padding:10px var(--gap)}
-    .brand{display:flex; gap:10px; align-items:center; font-weight:700}
-    .brand .dot{width:22px; height:22px; border-radius:50%; background: radial-gradient(circle at 30% 30%, #ffe082, #f59e0b 60%, #b45309); box-shadow:0 0 18px #f59e0b88, inset 0 0 10px #fff3}
-    nav{display:flex; gap:10px; flex-wrap:wrap}
-    nav a{padding:10px 12px; border-radius:10px; border:1px solid transparent; color:var(--text)}
-    nav a:hover{background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.08)}
-    main{max-width:var(--w-max); margin:0 auto; padding:22px var(--gap) 80px}
-    section{margin:30px 0}
-    .panel{background:linear-gradient(180deg, var(--panel), var(--panel-2)); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); box-shadow:var(--shadow); padding: clamp(16px, 2vw, 26px)}
-    h1,h2,h3{line-height:1.25; margin:0 0 10px}
-    h1{font-size: clamp(28px,4vw,42px)} h2{font-size: clamp(22px,3vw,28px)}
-    .badge{font-size:.75rem; background:rgba(255,255,255,.08); padding:2px 8px; border-radius:999px}
-    .tools{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:8px}
-    .chip{font-size:.8rem; padding:4px 8px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08)}
-    .hero{display:grid; grid-template-columns: 1fr 1.2fr; gap:var(--gap)} @media(max-width:1000px){.hero{grid-template-columns:1fr}}
-    #sceneWrap{position:relative; border-radius:12px; overflow:hidden; border:1px solid rgba(255,255,255,.06)}
-    /* ให้มี "ความสูงจริง" เสมอ — ไม่พึ่ง aspect-ratio อย่างเดียว */
-    #scene3d{width:100%; height: min(60vh, 560px); min-height: 340px}
-    #infoBox{margin-top:10px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:12px}
-    .grid{display:grid; gap:var(--gap); grid-template-columns: repeat(12, 1fr)}
-    .col-12{grid-column: span 12} .col-6{grid-column: span 6} .col-4{grid-column: span 4}
-    @media(max-width:1000px){ .col-4{grid-column: span 6} } @media(max-width:700px){ .col-6,.col-4{grid-column: span 12} }
-    .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:16px}
-    .tag{font-size:.85rem; color:var(--muted)} .planet-dot{width:12px; height:12px; border-radius:50%; display:inline-block; margin-right:6px; vertical-align:middle}
-    .facts{display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; margin-top:10px}
-    .facts div{background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06); padding:10px; border-radius:10px; font-size:.94rem}
-    .empty{opacity:.7; text-align:center; padding:30px}
-    .field{display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); padding:9px 12px; border-radius:10px}
-    .field input{background:transparent; border:0; outline:0; color:var(--text); min-width:220px}
-    .quiz q{font-style:italic}
-    .q-item{background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:12px; margin:10px 0}
-    .choices{display:grid; gap:8px; margin-top:6px}
-    .choices label{display:flex; gap:8px; align-items:flex-start; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06); padding:8px 10px; border-radius:10px; cursor:pointer}
-    .score{margin-top:12px; font-weight:700} .good{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)}
-    footer{margin-top:50px; padding:30px var(--gap); color:var(--muted); text-align:center; font-size:.9rem}
-    .kbd{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; background:rgba(255,255,255,.08); padding:2px 6px; border-radius:6px; border:1px solid rgba(255,255,255,.12)}
+    #toolbar label{font-size:13px;color:var(--muted)}
+    #toolbar input[type="range"]{width:180px}
+    #toolbar .btn{
+      background:var(--panel-2);border:1px solid #1f2b3c;color:var(--text);padding:6px 10px;border-radius:8px;
+      cursor:pointer;font-size:13px;transition:.2s;user-select:none
+    }
+    #toolbar .btn:hover{transform:translateY(-1px);border-color:#2a3b54}
+    #toolbar .btn.active{box-shadow:0 0 0 2px #2a3b54 inset; color:#fff}
+    #legend{
+      margin-left:auto;display:flex;gap:10px;align-items:center;font-size:12px;color:var(--muted)
+    }
+    .dot{width:8px;height:8px;border-radius:50%;}
+    .sun{background:#ffcc66;}
+    .orbit{background:#6aa2ff;}
+    .planet{background:#9be}
+    /* Side info panel */
+    #info{
+      position:fixed;right:12px;top:68px;bottom:12px;width:320px;max-width:92vw;
+      background:linear-gradient(180deg,rgba(20,28,40,.95),rgba(20,28,40,.9));
+      border:1px solid #1c2838;border-radius:12px;padding:14px;overflow:auto;z-index:9
+    }
+    #info h2{margin:0 0 6px 0;font-size:18px}
+    #info h3{margin:14px 0 6px 0;font-size:14px;color:var(--muted);font-weight:600;letter-spacing:.3px;text-transform:uppercase}
+    #info p{margin:0 0 10px 0;font-size:14px;line-height:1.45}
+    #info .pill{display:inline-block;padding:4px 8px;border:1px solid #22324a;border-radius:999px;margin:2px;font-size:12px;color:#cfe2ff;background:#0f1622}
+    #footerNote{position:fixed;left:12px;bottom:12px;font-size:12px;color:var(--muted);background:rgba(20,28,40,.75);padding:6px 8px;border:1px solid #1c2838;border-radius:8px;z-index:8}
+    /* Planet name labels from CSS2DRenderer */
+    .label{
+      color:#cfe2ff;background:rgba(15,22,32,.75);border:1px solid #1f2b3c;border-radius:6px;padding:2px 6px;
+      font-size:12px;backdrop-filter:blur(4px);white-space:nowrap;pointer-events:none
+    }
+    /* Small screens */
+    @media (max-width: 800px){
+      #toolbar{flex-wrap:wrap;gap:8px}
+      #info{top:auto;height:45%;right:12px;left:12px;width:auto}
+    }
+    a{color:var(--accent)}
   </style>
 </head>
 <body>
-<header role="banner">
-  <div class="bar">
-    <div class="brand">
-      <span class="dot" aria-hidden="true"></span>
-      <span>ระบบสุริยะ • Solar System EDU (3D)</span>
-      <span class="badge">ธีมมืดเท่านั้น</span>
+  <div id="app" aria-label="Interactive 3D Solar System"></div>
+
+  <div id="toolbar" role="toolbar" aria-label="Controls">
+    <button id="pauseBtn" class="btn" aria-pressed="false">⏸️ Pause</button>
+    <button id="resetCam" class="btn">🎯 Reset camera</button>
+    <button id="toggleOrbits" class="btn active" aria-pressed="true">🟢 Show Orbits</button>
+
+    <label for="speed">Time speed</label>
+    <input id="speed" type="range" min="0" max="6" step="0.01" value="2" />
+    <span id="speedVal" aria-live="polite">×10</span>
+
+    <label for="follow">Follow</label>
+    <select id="follow">
+      <option value="">Free camera</option>
+      <option value="Mercury">Mercury</option>
+      <option value="Venus">Venus</option>
+      <option value="Earth">Earth</option>
+      <option value="Mars">Mars</option>
+      <option value="Jupiter">Jupiter</option>
+      <option value="Saturn">Saturn</option>
+      <option value="Uranus">Uranus</option>
+      <option value="Neptune">Neptune</option>
+    </select>
+
+    <div id="legend">
+      <span class="dot sun"></span>Sun
+      <span class="dot orbit"></span>Orbit
+      <span class="dot planet"></span>Planet
     </div>
-    <nav aria-label="เมนู">
-      <a href="#home">หน้าแรก</a>
-      <a href="#planets">ดาวเคราะห์</a>
-      <a href="#glossary">คำศัพท์</a>
-      <a href="#quiz">แบบทดสอบ</a>
-    </nav>
   </div>
-</header>
 
-<main>
-  <section id="home" class="hero">
-    <div class="panel">
-      <h1>สำรวจระบบสุริยะ <span style="color:var(--accent)">แบบ 3D</span></h1>
-      <p>หมุน-ซูมฉากได้ และ <strong>คลิกดาวเคราะห์</strong> เพื่อดูข้อมูลด้านล่าง</p>
-      <div class="tools">
-        <span class="chip">#โคจรตามเส้น</span>
-        <span class="chip">#คลิกแล้วมีข้อมูล</span>
-        <span class="chip">#ธีมมืด</span>
-      </div>
-      <div class="panel" id="howto" style="margin-top:12px">
-        <strong>วิธีใช้</strong>
-        <ul>
-          <li>เมาส์: ลาก = หมุน | ล้อเมาส์ = ซูม | คลิก = เปิดข้อมูล</li>
-          <li>มือถือ: นิ้วเดียว = หมุน | สองนิ้ว = ซูม/แพน</li>
-          <li>เส้นวงโคจร = เส้นทางจริงในฉาก ดาวจะวิ่งตามเส้นนี้</li>
-        </ul>
-      </div>
-    </div>
+  <aside id="info" aria-live="polite">
+    <h2>Welcome 👋</h2>
+    <p>Explore a simplified, to-scale-ish 3D model of our Solar System. Drag to orbit, scroll/pinch to zoom, and right-drag to pan. Click any planet to learn more.</p>
+    <h3>How this model works</h3>
+    <p>Orbits are drawn in the ecliptic plane and planets move on circular paths with realistic <em>relative</em> orbital periods. Distances and sizes are scaled so everything fits on screen.</p>
+    <h3>Try these</h3>
+    <p class="pill">Click a planet</p><p class="pill">Change time speed</p><p class="pill">Follow a planet</p><p class="pill">Toggle orbits</p>
+    <h3>Selected</h3>
+    <div id="selected">None. Click a planet to see details.</div>
+  </aside>
 
-    <div class="panel">
-      <div id="sceneWrap"><div id="scene3d" aria-label="ฉากระบบสุริยะสามมิติ"></div></div>
-      <div id="infoBox" aria-live="polite" class="card" style="margin-top:10px">
-        <div><strong>คลิกดาวเคราะห์</strong> เพื่อดูข้อมูลที่นี่</div>
-      </div>
-    </div>
-  </section>
+  <div id="footerNote">Built with <a href="https://threejs.org/" target="_blank" rel="noopener">Three.js</a>. Dark-mode only. Best on modern browsers with WebGL.</div>
 
-  <section id="planets" class="panel">
-    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap">
-      <h2 style="margin:0">ดาวเคราะห์และดวงอาทิตย์</h2>
-      <div class="field" role="search">🔎
-        <input id="search" type="search" placeholder="ค้นหา: โลก, แก๊ส, 1 AU, 365 วัน…" aria-label="ค้นหาดาวเคราะห์" />
-      </div>
-    </div>
-    <div class="grid" id="planetGrid" style="margin-top:14px"></div>
-    <div id="emptyState" class="empty" hidden>ไม่พบผลลัพธ์ที่ตรงกับการค้นหา 🛰️</div>
-    <div class="panel" style="margin-top:16px">
-      <strong>หมายเหตุ:</strong> ค่าต่าง ๆ ในหน้านี้เป็นค่าเชิงประมาณเพื่อการศึกษา
-    </div>
-  </section>
+  <!-- Three.js + helpers (pinned versions for GitHub Pages) -->
+  <script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js';
+    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/controls/OrbitControls.js';
+    import { CSS2DRenderer, CSS2DObject } from 'https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/renderers/CSS2DRenderer.js';
 
-  <section id="glossary" class="panel">
-    <h2>คลังคำศัพท์ดาราศาสตร์</h2>
-    <div class="grid" style="margin-top:8px; grid-template-columns:repeat(12,1fr)">
-      <div class="col-6 card"><strong>AU (หน่วยดาราศาสตร์)</strong><p>≈ 150 ล้านกม. ระยะเฉลี่ย โลก→ดวงอาทิตย์</p></div>
-      <div class="col-6 card"><strong>เอียงแกน (Axial Tilt)</strong><p>มุมเอียงของแกนหมุน มีผลต่อฤดูกาล</p></div>
-      <div class="col-6 card"><strong>ดาวเคราะห์หิน/แก๊ส/น้ำแข็ง</strong><p>หิน: พุธ ศุกร์ โลก อังคาร | แก๊ส: พฤหัสบดี เสาร์ | น้ำแข็ง: ยูเรนัส เนปจูน</p></div>
-      <div class="col-6 card"><strong>ดาวเคราะห์แคระ</strong><p>โคจรรอบดวงอาทิตย์ มวลพอเป็นทรงกลม แต่ยังไม่เคลียร์บริเวณโคจร (เช่น พลูโต)</p></div>
-    </div>
-  </section>
+    // ---------- Scene setup ----------
+    const container = document.getElementById('app');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0b0f14);
 
-  <section id="quiz" class="panel quiz" aria-labelledby="quizTitle">
-    <h2 id="quizTitle">แบบทดสอบย่อย (5 ข้อ)</h2>
-    <form id="quizForm">
-      <div class="q-item">
-        <div>1) ดาวเคราะห์วงใน <q>Inner planets</q> คือกลุ่มใด?</div>
-        <div class="choices">
-          <label><input type="radio" name="q1" value="A"> พุธ ศุกร์ โลก อังคาร</label>
-          <label><input type="radio" name="q1" value="B"> พฤหัสบดี เสาร์ ยูเรนัส เนปจูน</label>
-          <label><input type="radio" name="q1" value="C"> โลก อังคาร พฤหัสบดี เสาร์</label>
-        </div>
-      </div>
-      <div class="q-item">
-        <div>2) โลกใช้เวลาประมาณเท่าใดในการโคจรรอบดวงอาทิตย์ 1 รอบ?</div>
-        <div class="choices">
-          <label><input type="radio" name="q2" value="A"> 24 ชั่วโมง</label>
-          <label><input type="radio" name="q2" value="B"> 365 วัน</label>
-          <label><input type="radio" name="q2" value="C"> 687 วัน</label>
-        </div>
-      </div>
-      <div class="q-item">
-        <div>3) ดาวเคราะห์ที่มีขนาดใหญ่ที่สุดในระบบสุริยะคือ?</div>
-        <div class="choices">
-          <label><input type="radio" name="q3" value="A"> ดาวเสาร์</label>
-          <label><input type="radio" name="q3" value="B"> ดาวศุกร์</label>
-          <label><input type="radio" name="q3" value="C"> ดาวพฤหัสบดี</label>
-        </div>
-      </div>
-      <div class="q-item">
-        <div>4) ดาวศุกร์หมุนรอบตัวเองแบบใด?</div>
-        <div class="choices">
-          <label><input type="radio" name="q4" value="A"> ทิศเดียวกับส่วนใหญ่ (ทวนเข็ม)</label>
-          <label><input type="radio" name="q4" value="B"> ย้อนทิศ (ตามเข็ม/Retrograde)</label>
-          <label><input type="radio" name="q4" value="C"> ไม่หมุน</label>
-        </div>
-      </div>
-      <div class="q-item">
-        <div>5) แถบดาวเคราะห์น้อยอยู่ระหว่างดาวคู่ใด?</div>
-        <div class="choices">
-          <label><input type="radio" name="q5" value="A"> พุธ–ศุกร์</label>
-          <label><input type="radio" name="q5" value="B"> อังคาร–พฤหัสบดี</label>
-          <label><input type="radio" name="q5" value="C"> เสาร์–ยูเรนัส</label>
-        </div>
-      </div>
-      <div class="tools">
-        <button class="chip" type="submit">ตรวจคำตอบ</button>
-        <button class="chip" type="reset">ล้างคำตอบ</button>
-        <span id="score" class="score" aria-live="polite"></span>
-      </div>
-    </form>
-  </section>
-</main>
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    container.appendChild(renderer.domElement);
 
-<footer>
-  สงวนลิขสิทธิ์ © <span id="year"></span> Solar System EDU • ไฟล์เดียวพร้อมรันบน GitHub Pages
-</footer>
+    const labelRenderer = new CSS2DRenderer();
+    labelRenderer.setSize(container.clientWidth, container.clientHeight);
+    labelRenderer.domElement.style.position = 'absolute';
+    labelRenderer.domElement.style.top = '0';
+    labelRenderer.domElement.style.pointerEvents = 'none';
+    container.appendChild(labelRenderer.domElement);
 
-<script>
-document.getElementById('year').textContent = new Date().getFullYear();
-</script>
+    const camera = new THREE.PerspectiveCamera(55, container.clientWidth/container.clientHeight, 0.1, 5000);
+    camera.position.set(0, 140, 420);
 
-<script type="module">
-  import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
-  import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.minDistance = 40;
+    controls.maxDistance = 1600;
 
-  const PLANETS = [
-    { id:'sun',     nameTH:'ดวงอาทิตย์', nameEN:'Sun',     type:'ดาวฤกษ์', color:'#f59e0b', dot:'#f59e0b', radius_km:696340, orbit_au:0,   orbit:'—',        rotation:'~25 วัน (ศูนย์สูตร)', moons:'—', facts:['พลังงานจากฟิวชัน','มวล >99% ของระบบสุริยะ'] },
-    { id:'mercury', nameTH:'ดาวพุธ',     nameEN:'Mercury', type:'หิน',      color:'#9aa1a8', dot:'#9aa1a8', radius_km:2440,   orbit_au:0.39, orbit:'88 วัน',  rotation:'~59 วัน',            moons:'ไม่มี', facts:['อุณหภูมิผันผวนมาก','เครเตอร์จำนวนมาก'] },
-    { id:'venus',   nameTH:'ดาวศุกร์',   nameEN:'Venus',   type:'หิน',      color:'#caa96a', dot:'#caa96a', radius_km:6052,   orbit_au:0.72, orbit:'225 วัน', rotation:'~243 วัน (ย้อนทิศ)',  moons:'ไม่มี', facts:['เรือนกระจกแรง','สว่างรองจากดวงจันทร์'] },
-    { id:'earth',   nameTH:'โลก',        nameEN:'Earth',   type:'หิน',      color:'#2b7a7b', dot:'#2b7a7b', radius_km:6371,   orbit_au:1.00, orbit:'365 วัน', rotation:'23 ชม. 56 นาที',     moons:'1 (ดวงจันทร์)', facts:['มีน้ำของเหลว','สนามแม่เหล็กโลก'] },
-    { id:'mars',    nameTH:'ดาวอังคาร',  nameEN:'Mars',    type:'หิน',      color:'#d25b38', dot:'#d25b38', radius_km:3390,   orbit_au:1.52, orbit:'687 วัน', rotation:'24.6 ชม.',           moons:'โฟบอส เดมอส', facts:['โอลิมปัสมอนส์','พายุฝุ่นใหญ่'] },
-    { id:'jupiter', nameTH:'ดาวพฤหัสบดี',nameEN:'Jupiter', type:'แก๊ส',     color:'#caa982', dot:'#caa982', radius_km:69911,  orbit_au:5.20, orbit:'11.86 ปี',rotation:'~9.9 ชม.',           moons:'หลายสิบดวง', facts:['จุดแดงใหญ่','วงแหวนจาง'] },
-    { id:'saturn',  nameTH:'ดาวเสาร์',   nameEN:'Saturn',  type:'แก๊ส',     color:'#d7c19a', dot:'#d7c19a', radius_km:58232,  orbit_au:9.58, orbit:'29.5 ปี', rotation:'~10.7 ชม.',          moons:'ไททัน ฯลฯ', facts:['วงแหวนเด่นชัด','ไททันมีบรรยากาศ'] },
-    { id:'uranus',  nameTH:'ดาวยูเรนัส', nameEN:'Uranus',  type:'น้ำแข็ง',  color:'#73d5e8', dot:'#73d5e8', radius_km:25362,  orbit_au:19.2, orbit:'84 ปี',   rotation:'~17 ชม. (เอียง ~98°)', moons:'>20 ดวง', facts:['เหมือนกลิ้ง','สีฟ้าจากมีเทน'] },
-    { id:'neptune', nameTH:'ดาวเนปจูน',  nameEN:'Neptune', type:'น้ำแข็ง',  color:'#3b6fff', dot:'#3b6fff', radius_km:24622,  orbit_au:30.1, orbit:'164.8 ปี',rotation:'~16 ชม.',            moons:'ทริตัน ฯลฯ', facts:['ลมแรงมาก','มีเทนดูดกลืนแดง'] }
-  ];
+    // ---------- Lights ----------
+    // Sun as bright emitter + ambient fill
+    const sunLight = new THREE.PointLight(0xffddaa, 2.2, 0, 2); // strong falloff
+    scene.add(sunLight);
+    scene.add(new THREE.AmbientLight(0x29364a, 0.25));
 
-  /* ====== 3D Scene ====== */
-  const wrap = document.getElementById('scene3d');
-  // เผื่อบางเบราว์เซอร์รายงาน clientHeight = 0 ให้ตั้งความสูงสำรอง
-  if (wrap.clientHeight < 10) { wrap.style.height = Math.max(340, Math.round(wrap.clientWidth*0.62)) + 'px'; }
+    // ---------- Starfield (no textures; GPU-friendly) ----------
+    (function makeStars(){
+      const starGeo = new THREE.BufferGeometry();
+      const starCount = 4000;
+      const positions = new Float32Array(starCount*3);
+      for(let i=0;i<starCount;i++){
+        // random on a shell
+        const r = 1800 + Math.random()*400;
+        const theta = Math.acos(2*Math.random()-1);
+        const phi = Math.random()*Math.PI*2;
+        positions[i*3+0] = r*Math.sin(theta)*Math.cos(phi);
+        positions[i*3+1] = r*Math.cos(theta);
+        positions[i*3+2] = r*Math.sin(theta)*Math.sin(phi);
+      }
+      starGeo.setAttribute('position', new THREE.BufferAttribute(positions,3));
+      const starMat = new THREE.PointsMaterial({ size: 1.2, transparent:true, opacity:0.85 });
+      const stars = new THREE.Points(starGeo, starMat);
+      scene.add(stars);
+    })();
 
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x060913);
-
-  const camera = new THREE.PerspectiveCamera(55, wrap.clientWidth / wrap.clientHeight, 0.1, 5000);
-  camera.position.set(0, 120, 260);
-
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setSize(wrap.clientWidth, wrap.clientHeight);
-  wrap.appendChild(renderer.domElement);
-
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true; controls.dampingFactor = 0.05;
-  controls.minDistance = 40; controls.maxDistance = 900;
-
-  const hemi = new THREE.HemisphereLight(0x334466, 0x000011, 0.6); scene.add(hemi);
-  const sunLight = new THREE.PointLight(0xffbb66, 2.2, 0, 2); scene.add(sunLight);
-
-  // Sun
-  const sun = new THREE.Mesh(
-    new THREE.SphereGeometry(10, 32, 32),
-    new THREE.MeshStandardMaterial({ color: 0xf5a623, emissive: 0xffa500, emissiveIntensity: 0.9, roughness: 0.4 })
-  );
-  sun.name = 'sun'; scene.add(sun);
-
-  // Stars
-  const starCount = 1200;
-  const starsPos = new Float32Array(starCount*3);
-  for(let i=0;i<starCount;i++){
-    const r = 1200*Math.cbrt(Math.random());
-    const theta = Math.random()*Math.PI*2;
-    const phi = Math.acos(2*Math.random()-1);
-    starsPos[i*3] = r*Math.sin(phi)*Math.cos(theta);
-    starsPos[i*3+1] = r*Math.cos(phi);
-    starsPos[i*3+2] = r*Math.sin(phi)*Math.sin(theta);
-  }
-  const stars = new THREE.Points(
-    new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(starsPos,3)),
-    new THREE.PointsMaterial({ size: 1.1, color: 0x9bb3ff })
-  );
-  scene.add(stars);
-
-  // Scales & speed
-  const scaleAU = 8;           // 1 AU -> 8 units (ย่อขนาดให้พอดีฉาก)
-  const sizeScale = 0.03;      // ย่อรัศมี
-  const BASE_SPEED = 0.6;      // ความเร็วรวม
-
-  const raycaster = new THREE.Raycaster();
-  const mouse = new THREE.Vector2();
-  const pickables = [];
-  const system = []; // {id,a,b,theta,omega,mesh}
-
-  function orbitPath(a_au){
-    const a = a_au*scaleAU, b = a*0.88; // วงรีเล็กน้อย
-    const seg = 256, pts = [];
-    for(let i=0;i<=seg;i++){
-      const t = (i/seg)*Math.PI*2;
-      pts.push(new THREE.Vector3(a*Math.cos(t), 0, b*Math.sin(t)));
-    }
-    const geo = new THREE.BufferGeometry().setFromPoints(pts);
-    const line = new THREE.Line(geo, new THREE.LineDashedMaterial({ color:0x5aa9ff, dashSize:1.2, gapSize:0.6, transparent:true, opacity:0.55 }));
-    line.computeLineDistances();
-    return {line,a,b};
-  }
-  function planetMesh(colorHex, radius_km){
-    const r = Math.max(0.8, Math.cbrt(radius_km) * sizeScale);
-    return new THREE.Mesh(
-      new THREE.SphereGeometry(r, 24, 18),
-      new THREE.MeshStandardMaterial({ color: new THREE.Color(colorHex), roughness:0.6 })
-    );
-  }
-
-  PLANETS.forEach(p=>{
-    if(p.id==='sun') return;
-    const {line,a,b} = orbitPath(p.orbit_au);
-    scene.add(line);
-
-    const m = planetMesh(p.color, p.radius_km);
-    m.userData.planetId = p.id; m.name = p.id;
-    pickables.push(m); scene.add(m);
-
-    if(p.id==='saturn'){
-      const pr = m.geometry.parameters.radius;
-      const ring = new THREE.Mesh(
-        new THREE.RingGeometry(Math.max(pr*1.6,2.4), Math.max(pr*2.6,3.6), 64),
-        new THREE.MeshBasicMaterial({ color:0xd7c19a, transparent:true, opacity:0.5, side:THREE.DoubleSide })
-      );
-      ring.rotation.x = -Math.PI/2.5; m.add(ring);
-    }
-
-    const a_au = p.orbit_au || 1;
-    const omega = BASE_SPEED / Math.sqrt(a_au**3);
-    system.push({ id:p.id, a, b, theta: Math.random()*Math.PI*2, omega, mesh: m });
-  });
-
-  const infoBox = document.getElementById('infoBox');
-  function showInfo(id){
-    const p = PLANETS.find(x=>x.id===id); if(!p) return;
-    infoBox.innerHTML = `
-      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
-        <div class="planet-dot" style="background:${p.dot};width:14px;height:14px"></div>
-        <div><strong>${p.nameTH}</strong> <span class="tag">(${p.nameEN})</span></div>
-      </div>
-      <div class="facts" style="margin-top:10px">
-        <div><strong>ประเภท</strong><br>${p.type}</div>
-        <div><strong>รัศมี</strong><br>${p.radius_km.toLocaleString()} กม.</div>
-        <div><strong>ระยะโคจร</strong><br>${p.orbit_au || '—'} AU</div>
-        <div><strong>เวลาโคจร</strong><br>${p.orbit}</div>
-        <div style="grid-column: span 2"><strong>ดวงจันทร์</strong><br>${p.moons}</div>
-      </div>
-      <ul style="margin-top:8px">${p.facts?.map(f=>`<li>${f}</li>`).join('')||''}</ul>
-      <div style="margin-top:10px"><a href="#${p.id}">ดูการ์ดรายละเอียด ⤵</a></div>
-    `;
-  }
-
-  function onPointer(ev){
-    const rect = renderer.domElement.getBoundingClientRect();
-    mouse.x = ((ev.clientX - rect.left) / rect.width) * 2 - 1;
-    mouse.y = -((ev.clientY - rect.top) / rect.height) * 2 + 1;
-    raycaster.setFromCamera(mouse, camera);
-    const hits = raycaster.intersectObjects(pickables, false);
-    if(hits.length){
-      const obj = hits[0].object;
-      showInfo(obj.userData.planetId);
-      obj.material.emissive = new THREE.Color(0xffffff);
-      obj.material.emissiveIntensity = 0.25;
-      setTimeout(()=>{ obj.material.emissiveIntensity = 0; }, 250);
-    }
-  }
-  renderer.domElement.addEventListener('pointerdown', onPointer);
-
-  function resize(){
-    // เผื่อกรณีเบราว์เซอร์รายงาน h=0
-    if (wrap.clientHeight < 10) { wrap.style.height = Math.max(340, Math.round(wrap.clientWidth*0.62)) + 'px'; }
-    const w = wrap.clientWidth, h = wrap.clientHeight || 400;
-    camera.aspect = w/h; camera.updateProjectionMatrix();
-    renderer.setSize(w,h);
-  }
-  window.addEventListener('resize', resize); resize();
-
-  const clock = new THREE.Clock();
-  function tick(){
-    const dt = clock.getDelta();
-    system.forEach(b=>{
-      b.theta += b.omega * dt;
-      b.mesh.position.set(b.a * Math.cos(b.theta), 0, b.b * Math.sin(b.theta));
-      b.mesh.rotation.y += 0.01;
-    });
+    // ---------- Sun ----------
+    const sunGeo = new THREE.SphereGeometry(16, 64, 64);
+    const sunMat = new THREE.MeshBasicMaterial({ color: 0xffcc66 });
+    const sun = new THREE.Mesh(sunGeo, sunMat);
+    scene.add(sun);
     sunLight.position.copy(sun.position);
-    controls.update();
-    renderer.render(scene, camera);
-    requestAnimationFrame(tick);
-  }
-  tick();
 
-  /* ====== Cards / Search / Quiz (ส่วนหน้าเนื้อหา) ====== */
-  const grid = document.getElementById('planetGrid');
-  function factList(facts){ return (facts||[]).map(f=>`<li>${f}</li>`).join(''); }
-  function card(p){
-    const dot = `<span class="planet-dot" style="background:${p.dot}"></span>`;
-    return `
-    <div class="col-4">
-      <article id="${p.id}" class="card" aria-labelledby="${p.id}-title">
-        <header>
-          <h3 id="${p.id}-title">${dot}${p.nameTH} <span class="tag">(${p.nameEN})</span></h3>
-          <div class="tag">ประเภท: ${p.type}</div>
-        </header>
-        <div class="facts">
-          <div><strong>รัศมี</strong><br>${p.radius_km.toLocaleString()} กม.</div>
-          <div><strong>ระยะโคจร</strong><br>${p.orbit_au || '—'} AU</div>
-          <div><strong>เวลาโคจร</strong><br>${p.orbit}</div>
-          <div><strong>หมุนรอบตัวเอง</strong><br>${p.rotation}</div>
-          <div style="grid-column: span 2"><strong>ดวงจันทร์</strong><br>${p.moons}</div>
-        </div>
-        <details><summary>รายละเอียดเพิ่มเติม</summary><ul style="margin-top:8px">${factList(p.facts)}</ul></details>
-      </article>
-    </div>`;
-  }
-  function render(list=PLANETS){ grid.innerHTML = list.map(card).join(''); document.getElementById('emptyState').hidden = list.length!==0; }
-  render();
+    // ---------- Data (scaled) ----------
+    // Units: distance in "scene units" (1 = ~1 million km *some scale*), periods in Earth days, size as relative radius
+    const PLANETS = [
+      { name:'Mercury', color:0xb1b1b1, radius:1.6, orbit: 28,  period: 88,    tilt: 0.01, info:{
+        type:'Terrestrial', fact:'Smallest planet; a year is ~88 Earth days.', moons:0 } },
+      { name:'Venus',   color:0xe0c283, radius:3.9, orbit: 52,  period: 225,   tilt: 177.4, info:{
+        type:'Terrestrial', fact:'Hottest surface due to runaway greenhouse effect.', moons:0 } },
+      { name:'Earth',   color:0x4da6ff, radius:4.1, orbit: 72,  period: 365,   tilt: 23.4, info:{
+        type:'Terrestrial', fact:'Only known world with life. One large moon.', moons:1 } },
+      { name:'Mars',    color:0xc7614b, radius:2.2, orbit: 110, period: 687,   tilt: 25.2, info:{
+        type:'Terrestrial', fact:'Red planet; home to Olympus Mons.', moons:2 } },
+      { name:'Jupiter', color:0xd7c7a3, radius:9.0, orbit: 370, period: 4333,  tilt: 3.1, info:{
+        type:'Gas Giant', fact:'Largest planet; Great Red Spot is a giant storm.', moons:'~95 known' } },
+      { name:'Saturn',  color:0xe8d6a8, radius:7.6, orbit: 680, period: 10759, tilt: 26.7, info:{
+        type:'Gas Giant', fact:'Iconic rings made of ice and rock.', moons:'~83 confirmed' } },
+      { name:'Uranus',  color:0x9ed9e8, radius:6.3, orbit: 1020,period: 30687, tilt: 97.8, info:{
+        type:'Ice Giant', fact:'Rotates on its side; extreme seasons.', moons:27 } },
+      { name:'Neptune', color:0x4e80ff, radius:6.1, orbit: 1600,period: 60190, tilt: 28.3, info:{
+        type:'Ice Giant', fact:'Fastest winds in the Solar System.', moons:14 } },
+    ];
 
-  document.getElementById('search').addEventListener('input', e=>{
-    const q = e.target.value.trim().toLowerCase();
-    const filtered = PLANETS.filter(p=>{
-      const txt = [p.nameTH,p.nameEN,p.type,p.radius_km,p.orbit_au,p.orbit,p.rotation,p.moons,...(p.facts||[])].join(' ').toLowerCase();
-      return txt.includes(q);
+    // ---------- Helpers ----------
+    const world = new THREE.Group(); scene.add(world);
+    const orbitLines = new THREE.Group(); world.add(orbitLines);
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    const clickable = [];
+
+    const planetMap = new Map();
+
+    // draw a flat circular orbit line in XZ plane
+    function makeOrbit(radius, color=0x3b5a9e){
+      const pts = [];
+      const seg = 256;
+      for(let i=0;i<=seg;i++){
+        const a = i/seg * Math.PI*2;
+        pts.push(new THREE.Vector3(Math.cos(a)*radius, 0, Math.sin(a)*radius));
+      }
+      const geo = new THREE.BufferGeometry().setFromPoints(pts);
+      const mat = new THREE.LineBasicMaterial({ color, transparent:true, opacity:0.5 });
+      return new THREE.Line(geo, mat);
+    }
+
+    function addLabel(obj, text){
+      const div = document.createElement('div');
+      div.className = 'label';
+      div.textContent = text;
+      const label = new CSS2DObject(div);
+      label.position.set(0, obj.userData.radius * 1.25 + 1.5, 0);
+      obj.add(label);
+      return label;
+    }
+
+    // ---------- Create planets ----------
+    const AU_SCALE = 1; // distances already scaled above
+    for(const p of PLANETS){
+      // pivot to rotate around the sun
+      const pivot = new THREE.Object3D();
+      world.add(pivot);
+
+      // planet mesh
+      const geo = new THREE.SphereGeometry(p.radius, 48, 32);
+      const mat = new THREE.MeshStandardMaterial({
+        color: p.color, metalness: 0.1, roughness: 0.6,
+        emissive: 0x000000, emissiveIntensity: 0.1
+      });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(p.orbit*AU_SCALE, 0, 0);
+      mesh.userData = { name:p.name, radius:p.radius, tilt:p.tilt, orbit:p.orbit, period:p.period, info:p.info, pivot, label:null };
+      pivot.add(mesh);
+
+      // axial tilt (visual only)
+      mesh.rotation.z = THREE.MathUtils.degToRad(p.tilt);
+
+      // orbit line
+      const orbit = makeOrbit(p.orbit*AU_SCALE);
+      orbitLines.add(orbit);
+
+      // label
+      const label = addLabel(mesh, p.name);
+      mesh.userData.label = label;
+
+      // save and click targets
+      planetMap.set(p.name, mesh);
+      clickable.push(mesh);
+
+      // Earth moon (tiny demo)
+      if(p.name === 'Earth'){
+        const moonPivot = new THREE.Object3D();
+        mesh.add(moonPivot);
+        const moon = new THREE.Mesh(
+          new THREE.SphereGeometry(1.1, 24, 16),
+          new THREE.MeshStandardMaterial({ color: 0xcfd6e3, roughness:0.6 })
+        );
+        moon.position.set(10, 0, 0); // scaled
+        moonPivot.add(moon);
+        mesh.userData.moonPivot = moonPivot;
+      }
+
+      // Saturn rings (visual)
+      if(p.name === 'Saturn'){
+        const inner = p.radius*1.6, outer = p.radius*3.0;
+        const ringGeo = new THREE.RingGeometry(inner, outer, 128);
+        // fade ring inside
+        const ringUV = ringGeo.attributes.uv;
+        for(let i=0;i<ringUV.count;i++){
+          const u = ringUV.getX(i);
+          ringUV.setY(i, 1 - u); // soft radial gradient feel
+        }
+        const ringMat = new THREE.MeshBasicMaterial({ color:0xdccfaa, transparent:true, opacity:0.55, side:THREE.DoubleSide });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.rotation.x = Math.PI/2;
+        ring.rotation.z = THREE.MathUtils.degToRad(p.tilt);
+        mesh.add(ring);
+      }
+    }
+
+    // ---------- UI wiring ----------
+    const selectedBox = document.getElementById('selected');
+    const infoPanel = document.getElementById('info');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const resetCam = document.getElementById('resetCam');
+    const toggleOrbits = document.getElementById('toggleOrbits');
+    const speedInput = document.getElementById('speed');
+    const speedVal = document.getElementById('speedVal');
+    const followSelect = document.getElementById('follow');
+
+    let showOrbits = true;
+    let paused = false;
+    let timeScale = 10; // initial ×10
+    function updateSpeedLabel(){
+      const v = Number(speedInput.value);
+      // map slider [0..6] → timescale [0.. 10^6] smoothly
+      timeScale = Math.round(Math.pow(10, v));
+      speedVal.textContent = `×${timeScale.toLocaleString()}`;
+    }
+    updateSpeedLabel();
+    speedInput.addEventListener('input', updateSpeedLabel);
+
+    pauseBtn.addEventListener('click', ()=>{
+      paused = !paused;
+      pauseBtn.classList.toggle('active', paused);
+      pauseBtn.setAttribute('aria-pressed', String(paused));
+      pauseBtn.textContent = paused ? '▶️ Resume' : '⏸️ Pause';
     });
-    render(filtered);
-  });
 
-  const quizKey = { q1:'A', q2:'B', q3:'C', q4:'B', q5:'B' };
-  document.getElementById('quizForm').addEventListener('submit', (e)=>{
-    e.preventDefault(); let score=0, total=Object.keys(quizKey).length;
-    for(const k in quizKey){ const v=(new FormData(e.target)).get(k); if(v===quizKey[k]) score++; }
-    const pct=Math.round(score/total*100); const el=document.getElementById('score');
-    let cls='good', msg='เยี่ยม!'; if(pct<60){cls='bad'; msg='ลองใหม่อีกครั้ง!';} else if(pct<80){cls='warn'; msg='ดีมาก!';}
-    el.className='score '+cls; el.textContent=`คะแนน: ${score}/${total} (${pct}%) – ${msg}`;
-  });
-</script>
+    toggleOrbits.addEventListener('click', ()=>{
+      showOrbits = !showOrbits;
+      orbitLines.visible = showOrbits;
+      toggleOrbits.classList.toggle('active', showOrbits);
+      toggleOrbits.setAttribute('aria-pressed', String(showOrbits));
+      toggleOrbits.textContent = showOrbits ? '🟢 Show Orbits' : '⚪ Hide Orbits';
+    });
+
+    const defaultCam = { pos: camera.position.clone(), target: new THREE.Vector3(0,0,0) };
+    resetCam.addEventListener('click', ()=>{
+      camera.position.copy(defaultCam.pos);
+      controls.target.copy(defaultCam.target);
+      controls.update();
+      followSelect.value = '';
+    });
+
+    // ---------- Interaction ----------
+    function planetDetails(mesh){
+      const { name, info, orbit, period } = mesh.userData;
+      const distAU = (orbit/100).toFixed(2); // coarse "AU-ish" label just for fun
+      return `
+        <h2>${name}</h2>
+        <p><strong>Type:</strong> ${info.type}</p>
+        <p><strong>Fun fact:</strong> ${info.fact}</p>
+        <p><strong>Approx. orbital distance (scaled):</strong> ${orbit.toLocaleString()} units (~${distAU} AU visual)</p>
+        <p><strong>Orbital period (relative):</strong> ${period.toLocaleString()} Earth days</p>
+        <p><strong>Moons:</strong> ${info.moons}</p>
+        <p style="margin-top:8px;color:#9ab">Note: Sizes & distances are scaled for visibility; orbits are circular in the ecliptic plane so planets follow their paths precisely in this model.</p>
+      `;
+    }
+
+    let highlight;
+    function setHighlight(obj){
+      if(highlight){
+        highlight.material.emissive.setHex(0x000000);
+        highlight.material.emissiveIntensity = 0.1;
+      }
+      highlight = obj || null;
+      if(highlight){
+        highlight.material.emissive.setHex(0x2266ff);
+        highlight.material.emissiveIntensity = 0.35;
+      }
+    }
+
+    function onPointer(e){
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects(clickable, true);
+      if(hits.length){
+        const mesh = hits[0].object;
+        setHighlight(mesh);
+        selectedBox.innerHTML = planetDetails(mesh);
+        followSelect.value = mesh.userData.name;
+      }
+    }
+    renderer.domElement.addEventListener('pointerdown', onPointer);
+
+    // ---------- Follow camera ----------
+    function followPlanet(){
+      const name = followSelect.value;
+      if(!name){ return; }
+      const mesh = planetMap.get(name);
+      if(!mesh){ return; }
+      const worldPos = new THREE.Vector3();
+      mesh.getWorldPosition(worldPos);
+      const offset = new THREE.Vector3(0, mesh.userData.radius*8 + 6, mesh.userData.radius*18 + 60);
+      camera.position.lerp(worldPos.clone().add(offset), 0.08);
+      controls.target.lerp(worldPos, 0.12);
+    }
+
+    // ---------- Animation ----------
+    const clock = new THREE.Clock();
+    const SECONDS_PER_DAY = 86400; // reference
+    const YEAR_DAYS = 365; // Earth
+    // scale "simulation seconds per real second" from slider (×timeScale)
+    function simStep(dtReal){
+      // dtReal in seconds; convert to simulation days
+      const simDays = dtReal * timeScale / (1.0); // 1 real second = timeScale days
+      const TWO_PI = Math.PI*2;
+      for(const p of PLANETS){
+        const mesh = planetMap.get(p.name);
+        const pivot = mesh.userData.pivot;
+        // advance orbit angle based on period
+        const dTheta = TWO_PI * (simDays / p.period);
+        pivot.rotation.y += dTheta;
+        // axial rotation (spin) — arbitrary but pleasant
+        mesh.rotation.y += 0.01 * (10 / Math.cbrt(p.radius));
+        if(mesh.userData.moonPivot){
+          // Moon ~27 day period scaled
+          mesh.userData.moonPivot.rotation.y += TWO_PI * (simDays / 27.3);
+        }
+      }
+    }
+
+    // ---------- Render loop ----------
+    function loop(){
+      requestAnimationFrame(loop);
+      const dt = clock.getDelta();
+      if(!paused) simStep(dt);
+      followPlanet();
+      controls.update();
+      renderer.render(scene, camera);
+      labelRenderer.render(scene, camera);
+    }
+    loop();
+
+    // ---------- Resize ----------
+    function onResize(){
+      const {clientWidth:w, clientHeight:h} = container;
+      camera.aspect = w/h; camera.updateProjectionMatrix();
+      renderer.setSize(w,h);
+      labelRenderer.setSize(w,h);
+    }
+    addEventListener('resize', onResize);
+
+    // ---------- Safety: WebGL check ----------
+    if(!renderer.capabilities.isWebGL2){
+      infoPanel.innerHTML = '<h2>WebGL not supported</h2><p>Your browser/device may not support WebGL 2. Please try the latest Chrome, Edge, or Firefox.</p>';
+    }
+
+    // Pre-select Earth
+    setTimeout(()=>{
+      const earth = planetMap.get('Earth');
+      setHighlight(earth);
+      selectedBox.innerHTML = planetDetails(earth);
+    }, 300);
+
+  </script>
 </body>
 </html>
